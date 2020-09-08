@@ -1,0 +1,75 @@
+<html>
+
+<canvas id = "gameCanvas" width = "1000" height = "800"><canvas>
+
+<script>
+
+	class Teava {
+		constructor() {
+			this.x = canvas.width;
+			this.h = canvas.height - Math.floor( Math.random() * canvas.height/(1.5) );
+		}
+
+		deplasare() {
+			this.x -= VITEZA_TEAVA;
+			drawRect(this.x, 0, LATIME_TEAVA, canvas.height - this.h, "rgb(0, 153, 51)");
+			drawRect(this.x, canvas.height - this.h + DIST_TEAVA, LATIME_TEAVA, this.h - DIST_TEAVA, "rgb(0, 153, 51)");
+		}
+	}
+
+	class Bird {
+		constructor() {
+			this.y = 0;
+		}
+
+		draw() {
+			drawRect(50, this.y, SIZEX, SIZEY, "rgb(219, 137, 6)");
+			drawRect(55, this.y + SIZEY/2, SIZEX/2, SIZEY/3, "rgb(252, 176, 0)");
+		}
+
+		jump() {
+			this.y += viteza;
+			viteza += acceleratie;
+		}
+	}
+
+	window.addEventListener("keydown", (e) => {
+		if(e.keyCode === 32) {
+			viteza = -15;
+		}
+	});
+
+	let viteza = 10;
+	let acceleratie = 1;
+	let SIZEX = 50, SIZEY= 30, FPS = 60, DIST_TEAVA = 200, LATIME_TEAVA = 75, VITEZA_TEAVA = 10;
+	let canvas = document.getElementById("gameCanvas");
+	let canvasContext = canvas.getContext("2d");
+	let bird = new Bird();
+	let teava = new Teava();
+
+
+	setInterval( () => {
+		drawRect(0, 0, canvas.width, (3/4)*canvas.height, "rgb(0, 199, 255)");
+		drawRect(0, 0, canvas.width, (1/9)*canvas.height, "rgb(206, 222, 229)");
+		drawRect(0, (3/4)*canvas.height, canvas.width, (1/4)*canvas.height, "rgb(66, 209, 85)");
+		bird.draw();
+		bird.jump();
+		teava.deplasare();
+		if(teava.x + LATIME_TEAVA <= 0) {
+			VITEZA_TEAVA += 0.5;
+			teava = new Teava();
+		}
+		if(50 + SIZEX >= teava.x  && 50 <= teava.x + LATIME_TEAVA && (bird.y <= canvas.height - teava.h || bird.y + SIZEY >= canvas.height - teava.h + DIST_TEAVA)) {
+			alert("Game over! Press F5 three times to reset.");
+			return ;
+		}
+	}, 1000/FPS)
+
+	function drawRect(_x, _y, _sx, _sy, _color) {
+		canvasContext.fillStyle = _color;
+		canvasContext.fillRect(_x, _y, _sx, _sy);
+	}
+
+</script>
+
+</html>

@@ -1,0 +1,121 @@
+<html>
+  <canvas
+    style="margin-left: 400px"
+    id="plane"
+    width="900"
+    height="900"
+  ></canvas>
+
+  <script>
+    const FPS = 15;
+    const COLOR_PLANE = "rgb(61, 63, 87)",
+      COLOR_SNAKE = "rgb(241, 253, 254)",
+      COLOR_FRUIT = "rgb(253, 0, 97)";
+    const GRID_SCALE = 30;
+
+    let canvas = document.getElementById("plane");
+    let canvasContext = canvas.getContext("2d");
+    let snake = new Array();
+    snake.push({ x: 0, y: 0 });
+    let dx = 0;
+    let dy = 0;
+    let xFruit, yFruit;
+    let pos;
+
+    window.addEventListener("keydown", event => {
+      if (event.keyCode == 38 && dy !== 1) {
+        dy = -1;
+        dx = 0;
+      }
+      if (event.keyCode == 40 && dy !== -1) {
+        dy = 1;
+        dx = 0;
+      }
+      if (event.keyCode == 37 && dx !== 1) {
+        dy = 0;
+        dx = -1;
+      }
+      if (event.keyCode == 39 && dx !== -1) {
+        dy = 0;
+        dx = 1;
+      }
+    });
+
+    newFruit();
+    setInterval(() => {
+      drawRect(0, 0, canvas.width, canvas.height, COLOR_PLANE);
+      drawRect(
+        xFruit * GRID_SCALE,
+        yFruit * GRID_SCALE,
+        GRID_SCALE - 1,
+        GRID_SCALE - 1,
+        COLOR_FRUIT
+      );
+      drawText();
+
+      for (let i = snake.length - 1; i > 0; i--) {
+        snake[i].x = snake[i - 1].x;
+        snake[i].y = snake[i - 1].y;
+        drawRect(
+          snake[i].x * GRID_SCALE,
+          snake[i].y * GRID_SCALE,
+          GRID_SCALE - 1,
+          GRID_SCALE - 1,
+          COLOR_SNAKE
+        );
+      }
+
+      if (snake[0].x == xFruit && snake[0].y == yFruit) {
+        newFruit();
+        grow();
+      }
+
+      snake[0].x += dx;
+      snake[0].y += dy;
+      if (snake[0].x >= 30) snake[0].x = 0;
+      if (snake[0].x < 0) snake[0].x = 30;
+      if (snake[0].y < 0) snake[0].y = 30;
+      if (snake[0].y > 30) snake[0].y = 0;
+      pos = snake.length;
+      for (let i = 1; i < snake.length; i++) {
+        if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) {
+          pos = i;
+          break;
+        }
+      }
+      while (snake.length !== pos) snake.pop();
+      drawRect(
+        snake[0].x * GRID_SCALE,
+        snake[0].y * GRID_SCALE,
+        GRID_SCALE - 1,
+        GRID_SCALE - 1,
+        COLOR_SNAKE
+      );
+    }, 1000 / FPS);
+
+    function drawRect(_x, _y, _sx, _sy, _c) {
+      canvasContext.fillStyle = _c;
+      canvasContext.fillRect(_x, _y, _sx, _sy);
+    }
+
+    function drawText() {
+      canvasContext.fillStyle = COLOR_FRUIT;
+      canvasContext.font = "20px Georgia";
+      canvasContext.fillText(
+        "Length: " + snake.length.toString(),
+        10,
+        20,
+        10000
+      );
+    }
+
+    function newFruit() {
+      xFruit = Math.floor(Math.random() * GRID_SCALE);
+      yFruit = Math.floor(Math.random() * GRID_SCALE);
+    }
+
+    function grow() {
+      snake.push({ x: 0, y: 0 });
+    }
+  </script>
+</html>
